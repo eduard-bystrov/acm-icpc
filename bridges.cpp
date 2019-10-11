@@ -1,125 +1,37 @@
 #include <iostream>
-#include <cmath>
-#include <algorithm>
-#include <utility>
-#include <string>
 #include <vector>
+#include <string>
+#include <algorithm>
 #include <set>
-#include <math.h>
 #include <map>
-#include <iomanip>
-#include <functional>
-#include <list>
-#include <random>
-#include <queue>
-#include <stdio.h>
-#include <regex>
-#include <bitset>
-#include <numeric>
-#include <bitset>
-#include <assert.h>
-#include <conio.h>
-#include <sstream>
-#include <fstream>
-#include <cstring>
-#include <array>
-#include <unordered_map>
 #include <unordered_set>
-#include <stack>
-
+#include <unordered_map>
+#include <queue>
+#include <algorithm>
+#include <functional>
+ 
+#define all(x) (x).begin(), (x).end()
+#define ALL(x) (x).begin(), (x).end()
+ 
+#define int long long
+ 
 using namespace std;
-
-#define all(cd) (cd).begin(), (cd).end()
-#define sqr(cd) ((cd) * (cd))
-
-#define y0 sdkfaslhagaklsldk
-#define y1 aasdfasdfasdf
-#define yn askfhwqriuperikldjk
-#define j1 assdgsdgasghsf
-#define tm sdfjahlfasfh
-#define lr asgasgash
-#define norm asdfasdgasdgsd
-#define have adsgagshdshfhds
-#define ends asdgahhfdsfshdshfd
-
-template <typename T> void alert(const T& t) { cout << t << endl; exit(0); }
-
-typedef long long int64;
-typedef unsigned long long uint64;
-typedef array<int64, 2> hv;
-
-int TIME = 0;
-
+ 
+int n, m;
+map<pair<int, int>, int> ids;
+set<int> ans;
 struct Node
 {
-	int in = 0;
-	int lowLink = 0;
-	bool inStack = false;
+	int in, lowLink;
 	vector<int> e;
 };
-map<pair<int, int>, int> ma;
-set<int> ans;
+ 
 vector<Node> g;
-vector<int> st;
-void DFS_T(int f,int p)
+ 
+void In()
 {
-	g[f].in = g[f].lowLink = ++TIME;
-	g[f].inStack = true;
-	st.push_back(f);
-
-	for (auto& t : g[f].e)
-	{
-		if (t == p) continue;
-		if (g[t].in == 0)
-		{
-			DFS_T(t, f);
-			g[f].lowLink = min(g[f].lowLink, g[t].lowLink);
-			if (g[t].lowLink > g[f].in)
-			{
-				ans.insert(ma[{f, t}]);
-			}
-		}
-		else if (g[f].inStack)
-		{
-			g[f].lowLink = min(g[f].lowLink, g[t].in);
-		}
-	}
-
-
-	if (g[f].lowLink == g[f].in)
-	{
-		int x;
-		do
-		{
-			x = st.back(); st.pop_back();
-			g[x].inStack = false;
-		} while (x != f);
-	}
-}
-
-int main()
-{
-#ifdef _DEBUG
-	freopen("ReadMe.txt", "r", stdin);
-	//freopen("123.txt", "w", stdout);
-	//test();
-#else
-	{
-
-		freopen("bridges.in", "r", stdin);
-		freopen("bridges.out", "w", stdout);
-	}
-#endif
-	//srand(time(NULL));
-	ios_base::sync_with_stdio(false);
-	cin.tie(0);
-	cout.tie(0);
-
-	int n, m;
 	cin >> n >> m;
-
 	g.assign(n, Node());
-
 	for (int i = 0; i < m; ++i)
 	{
 		int a, b;
@@ -127,21 +39,77 @@ int main()
 		--a; --b;
 		g[a].e.push_back(b);
 		g[b].e.push_back(a);
-		ma[{a, b}] = i+1;
-		ma[{b, a}] = i + 1;
+ 
+		ids[{a, b}] = i;
+		ids[{b, a}] = i;
 	}
-
+}
+ 
+int TIME = 0;
+void DFS_T(int v, int p)
+{
+	g[v].in = g[v].lowLink = ++TIME;
+ 
+	for (int i = 0; i < g[v].e.size(); ++i)
+	{
+		int to = g[v].e[i];
+ 
+		if (to == p) continue;
+ 
+		if (g[to].in == 0)
+		{
+			DFS_T(to, v);
+			g[v].lowLink = min(g[v].lowLink, g[to].lowLink);
+ 
+			if (g[v].in < g[to].lowLink)
+			{
+				ans.insert(ids[{v, to}]);
+			}
+		}
+		else
+		{
+			g[v].lowLink = min(g[v].lowLink, g[to].in);
+		}
+	}
+}
+ 
+void Solve()
+{
 	for (int i = 0; i < n; ++i)
 	{
 		if (g[i].in == 0)
 		{
-			DFS_T(i,-1);
+			DFS_T(i, -1);
 		}
 	}
-
+ 
 	cout << ans.size() << endl;
-	for (const auto& it : ans) cout << it << " ";
+	for (const auto& it : ans)
+	{
+		cout << it + 1 << " ";
+	}
+	cout << endl;
+}
+ 
+ 
+signed main()
+{
+#ifdef _DEBUG
+	freopen("in.txt", "r", stdin);
+	//freopen("out.txt", "w", stdout);
+#else
+	freopen("bridges.in", "r", stdin);
+	freopen("bridges.out", "w", stdout);
+#endif // _DEBUG
+ 
+	//srand(NULL);
+ 
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	cin.tie(NULL);
+ 
+	In();
+	Solve();
 	
-
 	return 0;
 }
